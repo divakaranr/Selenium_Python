@@ -1,0 +1,18 @@
+default_env: qa
+
+# Values shared by every environment; an environment block can override any of them.
+defaults:
+  browser: chrome          # chrome | firefox | edge
+  headless: false
+  window_size: 1920x1080
+  explicit_wait: 10        # seconds, used by WebDriverWait in BasePage
+  page_load_timeout: 30    # seconds
+
+environments:
+  qa:
+    base_url: https://www.saucedemo.com
+  staging:
+    base_url: https://www.saucedemo.com
+  prod:
+    base_url: https://www.saucedemo.com
+    headless: true

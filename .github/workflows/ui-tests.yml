@@ -1,0 +1,46 @@
+name: UI Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      marker:
+        description: "pytest marker expression (e.g. smoke). Leave empty to run everything."
+        required: false
+        default: ""
+
+jobs:
+  ui-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chrome, firefox]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: >
+          pytest -n auto --headless --browser ${{ matrix.browser }} --reruns 1
+          ${{ github.event.inputs.marker && format('-m "{0}"', github.event.inputs.marker) || '' }}
+
+      - name: Upload report and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-report-${{ matrix.browser }}
+          path: |
+            reports/
+            screenshots/
+            logs/
+          if-no-files-found: ignore
